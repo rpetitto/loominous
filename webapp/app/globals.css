@@ -1,0 +1,97 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #09090b;
+  --bg-secondary: #111118;
+  --border: rgba(255,255,255,0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-primary);
+  color: #f1f5f9;
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* Editable fields */
+[contenteditable="true"] {
+  outline: none;
+  cursor: text;
+  min-width: 1px;
+}
+[contenteditable="true"]:focus {
+  background: rgba(139, 92, 246, 0.06);
+  border-radius: 4px;
+}
+[contenteditable="true"]:hover:not(:focus) {
+  background: rgba(255,255,255,0.03);
+  border-radius: 4px;
+}
+
+/* Print / PDF styles */
+@media print {
+  body {
+    background: white !important;
+    color: #111 !important;
+    font-size: 11pt;
+  }
+  .no-print { display: none !important; }
+  .pdf-section { break-inside: avoid; }
+  .cheatsheet-pdf {
+    max-width: 100%;
+    padding: 0;
+  }
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #a78bfa 0%, #38bdf8 50%, #fb923c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Glass card */
+.glass {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  backdrop-filter: blur(12px);
+}
+
+/* Animated gradient background */
+.hero-gradient {
+  background: radial-gradient(ellipse at 20% 50%, rgba(139,92,246,0.15) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(56,189,248,0.1) 0%, transparent 60%),
+              radial-gradient(ellipse at 60% 80%, rgba(251,146,60,0.08) 0%, transparent 60%),
+              #09090b;
+}
+
+/* Section type badges */
+.badge-steps     { background: rgba(139,92,246,0.2); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
+.badge-tips      { background: rgba(251,146,60,0.2);  color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
+.badge-concepts  { background: rgba(56,189,248,0.2);  color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); }
+.badge-reference { background: rgba(52,211,153,0.2);  color: #34d399; border: 1px solid rgba(52,211,153,0.3); }
+.badge-code      { background: rgba(248,113,113,0.2); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+
+/* Drag handle */
+.drag-handle {
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.drag-handle:active { cursor: grabbing; }
+.section-card:hover .drag-handle { opacity: 1; }

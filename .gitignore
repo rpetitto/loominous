@@ -1,0 +1,18 @@
+# Dependencies
+webapp/node_modules/
+extension/node_modules/
+
+# Next.js
+webapp/.next/
+webapp/out/
+
+# Env
+webapp/.env.local
+webapp/.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

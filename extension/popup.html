@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loominous</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <span class="logo-icon">✨</span>
+        <span class="logo-text">Loom<span class="accent">inous</span></span>
+      </div>
+      <p class="tagline">Loom → Cheat Sheet</p>
+    </div>
+
+    <!-- Status: not on Loom page -->
+    <div id="not-loom" class="state" style="display:none">
+      <div class="icon-box">🎬</div>
+      <p class="state-title">Open a Loom video</p>
+      <p class="state-body">Navigate to a Loom share page or paste a URL in the app.</p>
+      <button class="btn btn-primary" id="open-app-btn">Open Loominous App</button>
+    </div>
+
+    <!-- Status: on Loom page -->
+    <div id="on-loom" class="state" style="display:none">
+      <div class="video-card">
+        <div class="video-thumb" id="video-thumb"></div>
+        <div class="video-info">
+          <p class="video-title" id="video-title">Loading...</p>
+          <p class="video-url" id="video-url"></p>
+        </div>
+      </div>
+
+      <div class="transcript-section">
+        <div class="transcript-header">
+          <span>Transcript</span>
+          <span class="transcript-badge" id="transcript-badge">Extracting…</span>
+        </div>
+        <textarea
+          id="transcript-area"
+          placeholder="Transcript will be extracted automatically…"
+          rows="5"
+        ></textarea>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="generate-btn">
+          <span>✨</span> Generate Cheat Sheet
+        </button>
+        <button class="btn btn-secondary" id="copy-transcript-btn">
+          Copy Transcript
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="state" style="display:none">
+      <div class="spinner"></div>
+      <p class="state-body">Extracting data…</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
