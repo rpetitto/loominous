@@ -2,10 +2,14 @@
   "manifest_version": 3,
   "name": "Loominous",
   "short_name": "Loominous",
-  "description": "Turn any Loom video into a beautiful cheat sheet. Extracts transcript and opens in Loominous.",
-  "version": "1.0.0",
-  "permissions": ["activeTab", "scripting", "storage", "tabs", "clipboardWrite"],
-  "host_permissions": ["https://www.loom.com/*"],
+  "description": "Turn any Loom video into a beautiful cheat sheet. Extracts transcript and captures screenshots.",
+  "version": "1.1.0",
+  "permissions": ["activeTab", "scripting", "storage", "tabs", "clipboardWrite", "windows"],
+  "host_permissions": [
+    "https://www.loom.com/*",
+    "https://loominous.flingit.run/*",
+    "http://localhost:3000/*"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -24,8 +28,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.loom.com/share/*"],
+      "matches": ["https://www.loom.com/share/*", "https://www.loom.com/embed/*"],
       "js": ["content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://loominous.flingit.run/*", "http://localhost:3000/*"],
+      "js": ["bridge.js"],
       "run_at": "document_idle"
     }
   ],
