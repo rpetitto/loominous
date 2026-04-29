@@ -1,4 +1,4 @@
-const APP_ORIGINS = ['https://loominous.flingit.run', 'http://localhost:3000'];
+const APP_ORIGINS = ['https://loominous.flingit.run'];
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 

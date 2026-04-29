@@ -1,4 +1,4 @@
-const APP_URL = 'http://localhost:3000';
+const APP_URL = 'https://loominous.flingit.run';
 
 function show(id) {
   document.querySelectorAll('.state').forEach(el => (el.style.display = 'none'));
