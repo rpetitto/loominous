@@ -5,6 +5,12 @@ window.postMessage({ __loominous: true, type: 'EXTENSION_READY' }, '*');
 
 window.addEventListener('message', async (event) => {
   if (event.source !== window || !event.data?.__loominous) return;
+
+  if (event.data.type === 'PING') {
+    window.postMessage({ __loominous: true, type: 'PONG' }, '*');
+    return;
+  }
+
   if (event.data.type !== 'CAPTURE_FRAMES') return;
 
   try {
