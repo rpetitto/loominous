@@ -20,6 +20,13 @@ function renumber(steps: StepsContent["steps"]): StepsContent["steps"] {
   return steps.map((s, i) => ({ ...s, number: i + 1 }));
 }
 
+function timestampToSeconds(ts: string): number {
+  const parts = ts.split(":").map(Number);
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  if (parts.length === 2) return parts[0] * 60 + parts[1];
+  return parts[0] ?? 0;
+}
+
 export default function StepsSection({
   content,
   editable,
@@ -57,6 +64,11 @@ export default function StepsSection({
       <div className="space-y-3">
         {content.steps.map((step, i) => {
           const imgSrc = step.screenshotUrl || (!isPdf ? thumbnailUrl : undefined);
+          const hasImg = !!imgSrc;
+          const tsSeconds = step.timestamp ? timestampToSeconds(step.timestamp) : null;
+          const loomUrl = videoId && tsSeconds !== null
+            ? `https://www.loom.com/share/${videoId}?t=${tsSeconds}`
+            : null;
 
           return (
             <div
@@ -65,7 +77,7 @@ export default function StepsSection({
                 isPdf ? "border border-gray-200 bg-white" : "bg-slate-900/60 border border-slate-700/40"
               }`}
             >
-              {/* Row controls (edit mode) */}
+              {/* Reorder / delete controls */}
               {editable && !isPdf && (
                 <div className="absolute top-2 right-2 flex items-center gap-0.5 opacity-0 group-hover/step:opacity-100 transition-opacity z-10">
                   <button
@@ -91,100 +103,132 @@ export default function StepsSection({
                 </div>
               )}
 
-              <div className="flex gap-4">
-                {/* Step number */}
-                <div
-                  className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm ${
-                    isPdf ? "bg-violet-100 text-violet-700" : "bg-violet-500/20 text-violet-300"
-                  }`}
-                >
-                  {step.number}
-                </div>
+              {/* Side-by-side layout */}
+              <div className="flex gap-4 items-start">
+                {/* Left: number + content */}
+                <div className="flex gap-3 flex-1 min-w-0">
+                  {/* Step number badge */}
+                  <div
+                    className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm ${
+                      isPdf ? "bg-violet-100 text-violet-700" : "bg-violet-500/20 text-violet-300"
+                    }`}
+                  >
+                    {step.number}
+                  </div>
 
-                <div className="flex-1 min-w-0">
-                  {/* Title row */}
-                  <div className="flex items-center justify-between gap-2 mb-1">
+                  <div className="flex-1 min-w-0">
+                    {/* Title */}
                     <p
                       contentEditable={editable && !isPdf}
                       suppressContentEditableWarning
                       onBlur={(e) => onUpdate?.(i, "title", e.currentTarget.textContent ?? "")}
-                      className={`font-semibold text-sm focus:outline-none ${isPdf ? "text-gray-900" : "text-white"}`}
+                      className={`font-semibold text-sm mb-1 focus:outline-none ${isPdf ? "text-gray-900" : "text-white"}`}
                     >
                       {step.title}
                     </p>
-                    <div className="flex items-center gap-2 flex-shrink-0 mr-16">
-                      {(step.timestamp || editable) && (
-                        <span
-                          className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md ${
-                            isPdf ? "bg-gray-100 text-gray-500" : "bg-slate-800 text-slate-500"
-                          }`}
-                        >
-                          <Clock size={10} />
+
+                    {/* Description */}
+                    <p
+                      contentEditable={editable && !isPdf}
+                      suppressContentEditableWarning
+                      onBlur={(e) => onUpdate?.(i, "description", e.currentTarget.textContent ?? "")}
+                      className={`text-xs leading-relaxed focus:outline-none ${isPdf ? "text-gray-600" : "text-slate-400"}`}
+                    >
+                      {step.description}
+                    </p>
+
+                    {/* Timestamp chip */}
+                    {(step.timestamp || editable) && (
+                      <div className="mt-2">
+                        {editable && !isPdf ? (
                           <span
-                            contentEditable={editable && !isPdf}
-                            suppressContentEditableWarning
-                            onBlur={(e) => onUpdate?.(i, "timestamp", e.currentTarget.textContent ?? "")}
-                            className="focus:outline-none"
+                            className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md ${
+                              isPdf ? "bg-gray-100 text-gray-500" : "bg-slate-800 text-slate-500"
+                            }`}
                           >
-                            {step.timestamp || (editable ? "0:00" : "")}
+                            <Clock size={10} />
+                            <span
+                              contentEditable
+                              suppressContentEditableWarning
+                              onBlur={(e) => onUpdate?.(i, "timestamp", e.currentTarget.textContent ?? "")}
+                              className="focus:outline-none min-w-[2ch]"
+                            >
+                              {step.timestamp || "0:00"}
+                            </span>
                           </span>
-                        </span>
-                      )}
-                      {editable && !isPdf && (
-                        <button
-                          onClick={() => setEditingIdx(i)}
-                          className="p-1 rounded-md text-slate-600 hover:text-violet-400 hover:bg-slate-800 transition-colors"
-                          title="Edit screenshot"
-                        >
-                          <ImagePlus size={13} />
-                        </button>
-                      )}
-                    </div>
+                        ) : loomUrl ? (
+                          <a
+                            href={loomUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md transition-colors ${
+                              isPdf
+                                ? "bg-gray-100 text-gray-500"
+                                : "bg-slate-800 text-slate-500 hover:bg-violet-500/20 hover:text-violet-300"
+                            }`}
+                          >
+                            <Clock size={10} />
+                            {step.timestamp}
+                          </a>
+                        ) : step.timestamp ? (
+                          <span
+                            className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md ${
+                              isPdf ? "bg-gray-100 text-gray-500" : "bg-slate-800 text-slate-500"
+                            }`}
+                          >
+                            <Clock size={10} />
+                            {step.timestamp}
+                          </span>
+                        ) : null}
+                      </div>
+                    )}
+
+                    {/* Edit screenshot button (edit mode only, compact) */}
+                    {editable && !isPdf && (
+                      <button
+                        onClick={() => setEditingIdx(i)}
+                        className="mt-2 inline-flex items-center gap-1 text-xs text-slate-600 hover:text-violet-400 transition-colors"
+                        title="Edit screenshot"
+                      >
+                        <ImagePlus size={12} />
+                        {hasImg ? "Edit screenshot" : "Add screenshot"}
+                      </button>
+                    )}
                   </div>
-
-                  {/* Description */}
-                  <p
-                    contentEditable={editable && !isPdf}
-                    suppressContentEditableWarning
-                    onBlur={(e) => onUpdate?.(i, "description", e.currentTarget.textContent ?? "")}
-                    className={`text-xs leading-relaxed focus:outline-none ${isPdf ? "text-gray-600" : "text-slate-400"}`}
-                  >
-                    {step.description}
-                  </p>
-
-                  {/* Screenshot thumbnail */}
-                  {imgSrc && (
-                    <div
-                      className={`mt-3 relative rounded-lg overflow-hidden border ${
-                        isPdf ? "border-gray-200" : "border-slate-700/40 group/shot cursor-pointer"
-                      }`}
-                      onClick={editable && !isPdf ? () => setEditingIdx(i) : undefined}
-                    >
-                      <img
-                        src={imgSrc}
-                        alt={`Step ${step.number}`}
-                        className="w-full block"
-                      />
-                      {editable && !isPdf && (
-                        <div className="absolute inset-0 bg-black/0 group-hover/shot:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover/shot:opacity-100">
-                          <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 text-slate-900 rounded-lg text-xs font-semibold shadow">
-                            <Pencil size={12} /> Edit screenshot
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Add screenshot button (when no image and editable) */}
-                  {!imgSrc && editable && !isPdf && (
-                    <button
-                      onClick={() => setEditingIdx(i)}
-                      className="mt-3 w-full flex items-center justify-center gap-2 py-4 rounded-lg border border-dashed border-slate-700/40 text-slate-600 hover:text-slate-400 hover:border-slate-600 transition-colors text-xs"
-                    >
-                      <ImagePlus size={14} /> Add screenshot
-                    </button>
-                  )}
                 </div>
+
+                {/* Right: screenshot */}
+                {hasImg ? (
+                  <div
+                    className={`flex-shrink-0 w-40 sm:w-48 rounded-lg overflow-hidden border ${
+                      isPdf
+                        ? "border-gray-200"
+                        : "border-slate-700/40 group/shot" + (editable ? " cursor-pointer" : "")
+                    }`}
+                    onClick={editable && !isPdf ? () => setEditingIdx(i) : undefined}
+                  >
+                    <img
+                      src={imgSrc!}
+                      alt={`Step ${step.number}`}
+                      className="w-full block"
+                    />
+                    {editable && !isPdf && (
+                      <div className="absolute inset-0 rounded-lg bg-black/0 group-hover/shot:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover/shot:opacity-100 pointer-events-none">
+                        <span className="flex items-center gap-1.5 px-2 py-1 bg-white/90 text-slate-900 rounded-lg text-xs font-semibold shadow">
+                          <Pencil size={11} /> Edit
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ) : editable && !isPdf ? (
+                  <button
+                    onClick={() => setEditingIdx(i)}
+                    className="flex-shrink-0 w-40 sm:w-48 flex flex-col items-center justify-center gap-1 py-6 rounded-lg border border-dashed border-slate-700/40 text-slate-600 hover:text-slate-400 hover:border-slate-600 transition-colors text-xs"
+                  >
+                    <ImagePlus size={16} />
+                    <span>Add screenshot</span>
+                  </button>
+                ) : null}
               </div>
             </div>
           );
