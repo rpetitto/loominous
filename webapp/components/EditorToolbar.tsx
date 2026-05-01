@@ -44,9 +44,9 @@ export default function EditorToolbar({
   const [showAddMenu, setShowAddMenu] = useState(false);
 
   async function handleShare() {
-    const url = window.location.href;
-    await navigator.clipboard.writeText(url).catch(() => {});
-    alert("Link copied to clipboard!");
+    const viewUrl = `${window.location.origin}/view/${cs.id}`;
+    await navigator.clipboard.writeText(viewUrl).catch(() => {});
+    alert("View link copied to clipboard!");
   }
 
   return (
