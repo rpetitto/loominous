@@ -83,7 +83,7 @@ function SectionWrapper({
     opacity: isDragging ? 0.4 : 1,
   };
 
-  const content = renderSectionContent(section, editable, isPdf, onContentChange);
+  const content = renderSectionContent(section, editable, isPdf, onContentChange, loom);
   if (!content) return null;
 
   if (isPdf) {
@@ -148,7 +148,8 @@ function renderSectionContent(
   section: Section,
   editable: boolean | undefined,
   isPdf: boolean,
-  onContentChange: (id: string, content: Section["content"]) => void
+  onContentChange: (id: string, content: Section["content"]) => void,
+  loom?: CheatSheet["loom"]
 ) {
   switch (section.type) {
     case "key-concepts":
@@ -171,12 +172,21 @@ function renderSectionContent(
           content={section.content as StepsContent}
           editable={editable}
           isPdf={isPdf}
+          thumbnailUrl={loom?.thumbnail}
+          videoId={loom?.videoId}
           onUpdate={(idx, field, val) => {
             const c = section.content as StepsContent;
             const steps = [...c.steps];
             steps[idx] = { ...steps[idx], [field]: val };
             onContentChange(section.id, { ...c, steps });
           }}
+          onUpdateScreenshot={(idx, url) => {
+            const c = section.content as StepsContent;
+            const steps = [...c.steps];
+            steps[idx] = { ...steps[idx], screenshotUrl: url };
+            onContentChange(section.id, { ...c, steps });
+          }}
+          onReplace={(newContent) => onContentChange(section.id, newContent)}
         />
       );
     case "tips":
