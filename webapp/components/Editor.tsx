@@ -175,12 +175,29 @@ export default function Editor({ initial }: Props) {
     update((prev) => ({ ...prev, style: s }));
   }
 
+  function handleDownloadPdf() {
+    const prev = style;
+    if (prev !== "pdf") {
+      setStyle("pdf");
+      // Wait for the PDF layout to render before printing
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          window.print();
+          window.addEventListener("afterprint", () => setStyle(prev), { once: true });
+        }, 150);
+      });
+    } else {
+      window.print();
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col">
       <EditorToolbar
         cs={cs}
         style={style}
         onStyleChange={handleStyleChange}
+        onDownloadPdf={handleDownloadPdf}
         saved={saved}
         onTitleChange={(t) => updateHero("title", t)}
         onSubtitleChange={(s) => updateHero("subtitle", s)}

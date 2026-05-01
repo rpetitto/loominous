@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   Layers,
 } from "lucide-react";
+
 import Link from "next/link";
 import type { CheatSheet, CheatSheetStyle, SectionType } from "@/lib/types";
 
@@ -25,6 +26,7 @@ interface Props {
   cs: CheatSheet;
   style: CheatSheetStyle;
   onStyleChange: (s: CheatSheetStyle) => void;
+  onDownloadPdf: () => void;
   saved: boolean;
   onTitleChange: (t: string) => void;
   onSubtitleChange: (s: string) => void;
@@ -35,20 +37,16 @@ export default function EditorToolbar({
   cs,
   style,
   onStyleChange,
+  onDownloadPdf,
   saved,
   onAddSection,
 }: Props) {
   const [showAddMenu, setShowAddMenu] = useState(false);
 
-  async function handleExport() {
-    if (style === "pdf") {
-      window.print();
-    } else {
-      // Copy shareable link
-      const url = window.location.href;
-      await navigator.clipboard.writeText(url).catch(() => {});
-      alert("Link copied to clipboard!");
-    }
+  async function handleShare() {
+    const url = window.location.href;
+    await navigator.clipboard.writeText(url).catch(() => {});
+    alert("Link copied to clipboard!");
   }
 
   return (
@@ -136,22 +134,22 @@ export default function EditorToolbar({
         )}
       </div>
 
-      {/* Export */}
+      {/* Download PDF */}
       <button
-        onClick={handleExport}
+        onClick={onDownloadPdf}
+        className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800/60 text-slate-300 hover:text-white hover:bg-slate-700/60 text-xs font-medium transition-all"
+      >
+        <Download size={13} />
+        PDF
+      </button>
+
+      {/* Share */}
+      <button
+        onClick={handleShare}
         className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold transition-all shadow-sm"
       >
-        {style === "pdf" ? (
-          <>
-            <Download size={13} />
-            Export PDF
-          </>
-        ) : (
-          <>
-            <Sparkles size={13} />
-            Share
-          </>
-        )}
+        <Sparkles size={13} />
+        Share
       </button>
     </header>
   );
